@@ -9,12 +9,12 @@ def main():
     default_api_key = os.getenv("OPENAI_API_KEY", "")
 
     st.set_page_config(
-        page_title="SocialSculptor",
+        page_title="Socials Sculptor",
         page_icon="✨",
         layout="centered"
     )
 
-    st.title("✨ Social Sculptor")
+    st.title("✨ Socials Sculptor")
     st.subheader("Transform your writing into engaging social media posts")
 
     # Initialize the transformer

@@ -2,10 +2,12 @@ import os
 from pathlib import Path
 from langchain_community.chat_models import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
+from database import Example, init_db
 
 class PostTransformer:
     def __init__(self):
         self.llm = None
+        self.db_session = init_db()
         self.examples = self._load_examples()
 
     def set_api_key(self, api_key):
@@ -14,13 +16,26 @@ class PostTransformer:
         self.llm = ChatOpenAI(temperature=0.8, model="gpt-4o-mini")
 
     def _load_examples(self):
-        """Load example posts from the data directory"""
-        examples_path = Path("data/examples.txt")
-        if not examples_path.exists():
-            return []
-        
-        with open(examples_path, "r", encoding="utf-8") as f:
-            return f.read().split("\n\n")
+        """Load examples from database"""
+        examples = self.db_session.query(Example).all()
+        return [example.content for example in examples]
+
+    def add_example(self, content):
+        """Add new example to database"""
+        example = Example(content=content)
+        self.db_session.add(example)
+        self.db_session.commit()
+        self.examples = self._load_examples()
+
+    def save_transformation(self, original_text, transformed_text, platform):
+        """Save transformation history"""
+        transformation = Transformation(
+            original_text=original_text,
+            transformed_text=transformed_text,
+            platform=platform
+        )
+        self.db_session.add(transformation)
+        self.db_session.commit()
 
     def transform_post(self, text, platform):
         """Transform the input text into a platform-specific post"""

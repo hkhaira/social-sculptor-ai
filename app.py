@@ -1,5 +1,6 @@
 import streamlit as st
 from langchain_pipeline import PostTransformer
+from database import Transformation
 
 def main():
     st.set_page_config(
@@ -8,7 +9,7 @@ def main():
         layout="centered"
     )
 
-    st.title("✨ SocialSculptor")
+    st.title("✨ Social Sculptor")
     st.subheader("Transform your writing into engaging social media posts")
 
     # Initialize the transformer
@@ -43,8 +44,33 @@ def main():
                 transformed_post = transformer.transform_post(user_text, platform)
                 st.success("Your transformed post is ready!")
                 st.text_area("Transformed Post:", value=transformed_post, height=150)
+                # Save the transformation
+                transformer.save_transformation(user_text, transformed_post, platform)
             except Exception as e:
                 st.error(f"An error occurred: {str(e)}")
+
+    # Add transformation history section
+    with st.expander("Transformation History"):
+        transformations = transformer.db_session.query(Transformation).order_by(
+            Transformation.created_at.desc()
+        ).limit(10).all()
+        
+        for t in transformations:
+            st.write(f"**Platform:** {t.platform}")
+            st.write("**Original:**")
+            st.text(t.original_text)
+            st.write("**Transformed:**")
+            st.text(t.transformed_text)
+            st.write(f"*Created at: {t.created_at}*")
+            st.divider()
+
+    # Add example management (for admins)
+    with st.sidebar:
+        if st.checkbox("Show Example Management"):
+            new_example = st.text_area("Add new example:")
+            if st.button("Add Example"):
+                transformer.add_example(new_example)
+                st.success("Example added successfully!")
 
 if __name__ == "__main__":
     main() 

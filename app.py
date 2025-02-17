@@ -1,6 +1,5 @@
 import streamlit as st
 from langchain_pipeline import PostTransformer
-from database import Transformation
 import os
 from dotenv import load_dotenv
 
@@ -43,9 +42,10 @@ def main():
     # Platform selection with auto-reload of examples
     platform = st.selectbox(
         "Select target platform:",
-        ["LinkedIn", "Twitter", "Instagram"],
-        on_change=lambda: transformer.set_platform(platform)
+        ["LinkedIn", "Twitter", "Instagram"]
     )
+    # Set the platform immediately after selection
+    transformer.set_platform(platform)
 
     if st.button("Transform ✨", disabled=not api_key):
         if not user_text:
@@ -58,7 +58,7 @@ def main():
                 st.success("Your transformed post is ready!")
                 st.text_area("Transformed Post:", value=transformed_post, height=150)
                 # Save the transformation
-                transformer.save_transformation(user_text, transformed_post, platform)
+                transformer.save_transformation(user_text, transformed_post)
             except Exception as e:
                 st.error(f"An error occurred: {str(e)}")
 

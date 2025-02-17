@@ -1,8 +1,8 @@
 import os
-from pathlib import Path
 from langchain_community.chat_models import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
-from database import Example, init_db, Transformation, LinkedInExample, TwitterExample, InstagramExample, LinkedInTransformation, TwitterTransformation, InstagramTransformation
+from database import init_db, LinkedInExample, TwitterExample, InstagramExample, LinkedInTransformation, TwitterTransformation, InstagramTransformation
+import uuid
 
 class PostTransformer:
     PLATFORM_MODELS = {
@@ -49,6 +49,7 @@ class PostTransformer:
             
         transformation_model = self.PLATFORM_MODELS[self.current_platform][1]
         transformation = transformation_model(
+            id=str(uuid.uuid4()),
             original_text=original_text,
             transformed_text=transformed_text
         )

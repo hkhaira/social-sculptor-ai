@@ -2,40 +2,63 @@ import os
 from pathlib import Path
 from langchain_community.chat_models import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
-from database import Example, init_db, Transformation
+from database import Example, init_db, Transformation, LinkedInExample, TwitterExample, InstagramExample, LinkedInTransformation, TwitterTransformation, InstagramTransformation
 
 class PostTransformer:
+    PLATFORM_MODELS = {
+        'LinkedIn': (LinkedInExample, LinkedInTransformation),
+        'Twitter': (TwitterExample, TwitterTransformation),
+        'Instagram': (InstagramExample, InstagramTransformation)
+    }
+
     def __init__(self):
         self.llm = None
         self.db_session = init_db()
+        self.current_platform = None
+        self.examples = []
+
+    def set_platform(self, platform):
+        """Update current platform and load relevant examples"""
+        self.current_platform = platform
         self.examples = self._load_examples()
+
+    def _load_examples(self):
+        """Load platform-specific examples"""
+        if not self.current_platform:
+            return []
+        
+        example_model = self.PLATFORM_MODELS[self.current_platform][0]
+        examples = self.db_session.query(example_model).all()
+        return [example.content for example in examples]
+
+    def add_example(self, content):
+        """Add new example to platform-specific table"""
+        if not self.current_platform:
+            raise ValueError("Please select a platform first!")
+            
+        example_model = self.PLATFORM_MODELS[self.current_platform][0]
+        example = example_model(content=content)
+        self.db_session.add(example)
+        self.db_session.commit()
+        self.examples = self._load_examples()
+
+    def save_transformation(self, original_text, transformed_text):
+        """Save transformation to platform-specific table"""
+        if not self.current_platform:
+            raise ValueError("Please select a platform first!")
+            
+        transformation_model = self.PLATFORM_MODELS[self.current_platform][1]
+        transformation = transformation_model(
+            original_text=original_text,
+            transformed_text=transformed_text
+        )
+        self.db_session.add(transformation)
+        self.db_session.commit()
 
     def set_api_key(self, api_key):
         """Initialize the LLM with the provided API key"""
         os.environ["OPENAI_API_KEY"] = api_key
         self.llm = ChatOpenAI(temperature=0.8, model="gpt-4o-mini")
-
-    def _load_examples(self):
-        """Load examples from database"""
-        examples = self.db_session.query(Example).all()
-        return [example.content for example in examples]
-
-    def add_example(self, content):
-        """Add new example to database"""
-        example = Example(content=content)
-        self.db_session.add(example)
-        self.db_session.commit()
-        self.examples = self._load_examples()
-
-    def save_transformation(self, original_text, transformed_text, platform):
-        """Save transformation history"""
-        transformation = Transformation(
-            original_text=original_text,
-            transformed_text=transformed_text,
-            platform=platform
-        )
-        self.db_session.add(transformation)
-        self.db_session.commit()
 
     def transform_post(self, text, platform):
         """Transform the input text into a platform-specific post"""

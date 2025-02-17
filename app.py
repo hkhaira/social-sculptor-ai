@@ -40,9 +40,11 @@ def main():
         placeholder="Paste your text here..."
     )
 
+    # Platform selection with auto-reload of examples
     platform = st.selectbox(
         "Select target platform:",
-        ["LinkedIn", "Twitter", "Instagram"]
+        ["LinkedIn", "Twitter", "Instagram"],
+        on_change=lambda: transformer.set_platform(platform)
     )
 
     if st.button("Transform ✨", disabled=not api_key):
@@ -60,14 +62,14 @@ def main():
             except Exception as e:
                 st.error(f"An error occurred: {str(e)}")
 
-    # Add transformation history section
+    # Update transformation history to use platform-specific table
     with st.expander("Transformation History"):
-        transformations = transformer.db_session.query(Transformation).order_by(
-            Transformation.created_at.desc()
+        transformation_model = transformer.PLATFORM_MODELS[platform][1]
+        transformations = transformer.db_session.query(transformation_model).order_by(
+            transformation_model.created_at.desc()
         ).limit(10).all()
         
         for t in transformations:
-            st.write(f"**Platform:** {t.platform}")
             st.write("**Original:**")
             st.text(t.original_text)
             st.write("**Transformed:**")

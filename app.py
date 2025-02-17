@@ -1,8 +1,14 @@
 import streamlit as st
 from langchain_pipeline import PostTransformer
 from database import Transformation
+import os
+from dotenv import load_dotenv
 
 def main():
+    # Load environment variables
+    load_dotenv()
+    default_api_key = os.getenv("OPENAI_API_KEY", "")
+
     st.set_page_config(
         page_title="SocialSculptor",
         page_icon="✨",
@@ -18,7 +24,12 @@ def main():
     # API Key handling
     with st.sidebar:
         st.header("Configuration")
-        api_key = st.text_input("OpenAI API Key", type="password")
+        api_key = st.text_input(
+            "OpenAI API Key", 
+            value=default_api_key,
+            type="password",
+            help="Enter your OpenAI API key. You can also set it in the .env file."
+        )
         if api_key:
             transformer.set_api_key(api_key)
 

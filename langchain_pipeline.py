@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from langchain_community.chat_models import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
-from database import Example, init_db
+from database import Example, init_db, Transformation
 
 class PostTransformer:
     def __init__(self):

@@ -10,8 +10,11 @@ pinned: false
 license: mit
 short_description: Transform your writing into engaging social media posts
 ---
+<!-- The YAML above is required for Hugging Face Spaces.
+   When GitHub renders README.md, its markdown engine (via Jekyll) strips out YAML front matter,
+   so it won’t be displayed on the repository page. -->
 
-# Socials Sculptor
+# ✨ Socials Sculptor
 
 Transform your writing into engaging social media posts using AI.
 
@@ -49,9 +52,9 @@ Transform your writing into engaging social media posts using AI.
 4. Set up your environment:
    - Create a `.env` file in the project root
    - Add your OpenAI API key (optional, can also be entered in UI):
-     ```
-     OPENAI_API_KEY=your-api-key-here
-     ```
+   ```
+   OPENAI_API_KEY=your-api-key-here
+   ```
 
 5. Run the application:
    ```bash

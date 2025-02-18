@@ -10,11 +10,11 @@ pinned: false
 license: mit
 short_description: Transform your writing into engaging social media posts
 ---
-<!-- The YAML above is required for Hugging Face Spaces.
-   When GitHub renders README.md, its markdown engine (via Jekyll) strips out YAML front matter,
-   so it won’t be displayed on the repository page. -->
+<!-- The YAML above is required for Hugging Face Spaces. -->
 
 # ✨ Socials Sculptor
+
+[![Demo](https://img.shields.io/badge/Demo-Hugging%20Face-yellow)](https://huggingface.co/spaces/hkhaira/socials-sculptor-ai)
 
 Transform your writing into engaging social media posts using AI.
 

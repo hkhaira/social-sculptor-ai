@@ -84,4 +84,4 @@ Transform your writing into engaging social media posts using AI.
 
 ## License
 
-MIT 
+[MIT - LICENSE](LICENSE)

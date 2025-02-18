@@ -3,6 +3,7 @@ from langchain_pipeline import PostTransformer
 import os
 from dotenv import load_dotenv
 
+
 def main():
     # Load environment variables
     load_dotenv()
@@ -11,7 +12,8 @@ def main():
     st.set_page_config(
         page_title="Socials Sculptor",
         page_icon="✨",
-        layout="centered"
+        layout="centered",
+        initial_sidebar_state="collapsed"  # set sidebar closed by default
     )
 
     st.title("✨ Socials Sculptor")
@@ -24,26 +26,22 @@ def main():
     with st.sidebar:
         st.header("Configuration")
         api_key = st.text_input(
-            "OpenAI API Key", 
+            "OpenAI API Key",
             value=default_api_key,
             type="password",
-            help="Enter your OpenAI API key. You can also set it in the .env file."
-        )
+            help=
+            "Enter your OpenAI API key. You can also set it in the .env file.")
         if api_key:
             transformer.set_api_key(api_key)
 
     # Main interface
-    user_text = st.text_area(
-        "Enter your text:",
-        height=150,
-        placeholder="Paste your text here..."
-    )
+    user_text = st.text_area("Enter your text:",
+                             height=150,
+                             placeholder="Paste your text here...")
 
     # Platform selection with auto-reload of examples
-    platform = st.selectbox(
-        "Select target platform:",
-        ["LinkedIn", "Twitter", "Instagram"]
-    )
+    platform = st.selectbox("Select target platform:",
+                            ["LinkedIn", "Twitter", "Instagram"])
     # Set the platform immediately after selection
     transformer.set_platform(platform)
 
@@ -54,9 +52,12 @@ def main():
 
         with st.spinner("Transforming your post..."):
             try:
-                transformed_post = transformer.transform_post(user_text, platform)
+                transformed_post = transformer.transform_post(
+                    user_text, platform)
                 st.success("Your transformed post is ready!")
-                st.text_area("Transformed Post:", value=transformed_post, height=150)
+                st.text_area("Transformed Post:",
+                             value=transformed_post,
+                             height=150)
                 # Save the transformation
                 transformer.save_transformation(user_text, transformed_post)
             except Exception as e:
@@ -65,10 +66,10 @@ def main():
     # Update transformation history to use platform-specific table
     with st.expander("Transformation History"):
         transformation_model = transformer.PLATFORM_MODELS[platform][1]
-        transformations = transformer.db_session.query(transformation_model).order_by(
-            transformation_model.created_at.desc()
-        ).limit(10).all()
-        
+        transformations = transformer.db_session.query(
+            transformation_model).order_by(
+                transformation_model.created_at.desc()).limit(10).all()
+
         for t in transformations:
             st.write("**Original:**")
             st.text(t.original_text)
@@ -85,5 +86,6 @@ def main():
                 transformer.add_example(new_example)
                 st.success("Example added successfully!")
 
+
 if __name__ == "__main__":
-    main() 
+    main()

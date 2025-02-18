@@ -9,6 +9,9 @@ def main():
     load_dotenv()
     default_api_key = os.getenv("OPENAI_API_KEY", "")
 
+    # Set api_key from the environment variable
+    api_key = default_api_key
+
     st.set_page_config(
         page_title="Socials Sculptor",
         page_icon="✨",
@@ -22,17 +25,20 @@ def main():
     # Initialize the transformer
     transformer = PostTransformer()
 
-    # API Key handling
-    with st.sidebar:
-        st.header("Configuration")
-        api_key = st.text_input(
-            "OpenAI API Key",
-            value=default_api_key,
-            type="password",
-            help=
-            "Enter your OpenAI API key. You can also set it in the .env file.")
-        if api_key:
-            transformer.set_api_key(api_key)
+    # API Key handling (User input commented out for security)
+    # with st.sidebar:
+    #     st.header("Configuration")
+    #     api_key = st.text_input(
+    #         "OpenAI API Key",
+    #         value=default_api_key,
+    #         type="password",
+    #         help="Enter your OpenAI API key. You can also set it in the .env file."
+    #     )
+    #     if api_key:
+    #         transformer.set_api_key(api_key)
+
+    # Set the API key using the environment variable
+    transformer.set_api_key(api_key)
 
     # Main interface
     user_text = st.text_area("Enter your text:",
@@ -80,11 +86,16 @@ def main():
 
     # Add example management (for admins)
     with st.sidebar:
-        if st.checkbox("Show Example Management"):
-            new_example = st.text_area("Add new example:")
-            if st.button("Add Example"):
-                transformer.add_example(new_example)
-                st.success("Example added successfully!")
+        st.header("Configuration")
+        st.subheader("Training Examples")
+        new_example = st.text_area(
+            "Your Example:",
+            help=
+            "Provide examples to train the AI on your writing style for generating improved posts."
+        )
+        if st.button("Add Example"):
+            transformer.add_example(new_example)
+            st.success("Example added successfully!")
 
 
 if __name__ == "__main__":

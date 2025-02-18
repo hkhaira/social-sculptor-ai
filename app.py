@@ -22,6 +22,26 @@ def main():
     st.title("✨ Socials Sculptor")
     st.subheader("Transform your writing into engaging social media posts")
 
+    # Configuration section in sidebar
+    with st.sidebar:
+        st.header("Configuration")
+        st.subheader("Training Examples")
+        new_example = st.text_area(
+            "Your Example:",
+            help=
+            "Provide examples to train the AI on your writing style for generating improved posts."
+        )
+        if st.button("Add Example"):
+            transformer.add_example(new_example)
+            st.success("Example added successfully!")
+
+        # Add temperature slider in sidebar
+        temperature = st.slider("LLM Temperature",
+                                min_value=0.0,
+                                max_value=1.0,
+                                value=0.8,
+                                step=0.01)
+
     # Initialize the transformer
     transformer = PostTransformer()
 
@@ -38,7 +58,7 @@ def main():
     #         transformer.set_api_key(api_key)
 
     # Set the API key using the environment variable
-    transformer.set_api_key(api_key)
+    transformer.set_api_key(api_key, temperature)  # pass temperature value
 
     # Main interface
     user_text = st.text_area("Enter your text:",
@@ -83,19 +103,6 @@ def main():
             st.text(t.transformed_text)
             st.write(f"*Created at: {t.created_at}*")
             st.divider()
-
-    # Add example management (for admins)
-    with st.sidebar:
-        st.header("Configuration")
-        st.subheader("Training Examples")
-        new_example = st.text_area(
-            "Your Example:",
-            help=
-            "Provide examples to train the AI on your writing style for generating improved posts."
-        )
-        if st.button("Add Example"):
-            transformer.add_example(new_example)
-            st.success("Example added successfully!")
 
 
 if __name__ == "__main__":

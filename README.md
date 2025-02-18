@@ -1,3 +1,16 @@
+---
+title: Socials Sculptor
+emoji: ✨
+colorFrom: red
+colorTo: purple
+sdk: streamlit
+sdk_version: 1.42.1
+app_file: app.py
+pinned: false
+license: mit
+short_description: Transform your writing into engaging social media posts
+---
+
 # Socials Sculptor
 
 Transform your writing into engaging social media posts using AI.

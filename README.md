@@ -1,5 +1,5 @@
 ---
-title: Socials Sculptor
+title: Social Sculptor
 emoji: ✨
 colorFrom: red
 colorTo: purple
@@ -12,7 +12,7 @@ short_description: Transform your writing into engaging social media posts
 ---
 <!-- The YAML above is required for Hugging Face Spaces. -->
 
-# ✨ Socials Sculptor
+# ✨ Social Sculptor
 
 [![Demo](https://img.shields.io/badge/Demo-Hugging%20Face-yellow)](https://huggingface.co/spaces/hkhaira/socials-sculptor-ai)
 
@@ -79,7 +79,7 @@ Transform your writing into engaging social media posts using AI.
 ## Data Storage
 
 - All transformations and examples are automatically stored in a local SQLite database
-- The database file (`socials_sculptor.db`) is created in your project directory
+- The database file (`social_sculptor.db`) is created in your project directory
 - To start fresh, simply delete the database file (it will be recreated on next run)
 
 ## License

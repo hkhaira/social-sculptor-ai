@@ -45,6 +45,6 @@ class InstagramTransformation(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
 def init_db():
-    engine = create_engine('sqlite:///socials_sculptor.db')
+    engine = create_engine('sqlite:///social_sculptor.db')
     Base.metadata.create_all(engine)
     return sessionmaker(bind=engine)() 

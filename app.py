@@ -13,13 +13,13 @@ def main():
     api_key = default_api_key
 
     st.set_page_config(
-        page_title="Socials Sculptor",
+        page_title="Social Sculptor",
         page_icon="✨",
         layout="centered",
         initial_sidebar_state="collapsed"  # set sidebar closed by default
     )
 
-    st.title("✨ Socials Sculptor")
+    st.title("✨ Social Sculptor")
     st.subheader("Transform your writing into engaging social media posts")
 
     # Configuration section in sidebar

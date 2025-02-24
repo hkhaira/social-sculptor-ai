@@ -22,6 +22,10 @@ def main():
     st.title("✨ Social Sculptor")
     st.subheader("Transform your writing into engaging social media posts")
 
+    # Move transformer initialization to the top, before sidebar
+    # Initialize the transformer
+    transformer = PostTransformer()
+
     # Configuration section in sidebar
     with st.sidebar:
         st.header("Configuration")
@@ -52,21 +56,6 @@ def main():
                                 max_value=1.0,
                                 value=0.8,
                                 step=0.01)
-
-    # Initialize the transformer
-    transformer = PostTransformer()
-
-    # API Key handling (User input commented out for security)
-    # with st.sidebar:
-    #     st.header("Configuration")
-    #     api_key = st.text_input(
-    #         "OpenAI API Key",
-    #         value=default_api_key,
-    #         type="password",
-    #         help="Enter your OpenAI API key. You can also set it in the .env file."
-    #     )
-    #     if api_key:
-    #         transformer.set_api_key(api_key)
 
     # Set the API key using the environment variable
     transformer.set_api_key(api_key, temperature)  # pass temperature value

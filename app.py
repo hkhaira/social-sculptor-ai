@@ -8,8 +8,6 @@ def main():
     # Load environment variables
     load_dotenv()
     default_api_key = os.getenv("OPENAI_API_KEY", "")
-
-    # Set api_key from the environment variable
     api_key = default_api_key
 
     st.set_page_config(
@@ -22,9 +20,21 @@ def main():
     st.title("✨ Social Sculptor")
     st.subheader("Transform your writing into engaging social media posts")
 
-    # Move transformer initialization to the top, before sidebar
     # Initialize the transformer
     transformer = PostTransformer()
+    
+    # Initialize platform in session state if not present
+    if "platform" not in st.session_state:
+        st.session_state.platform = "LinkedIn"
+
+    # Platform selection with auto-reload of examples (moved to top)
+    platform = st.selectbox("Select target platform:",
+                          ["LinkedIn", "Twitter", "Instagram"],
+                          index=["LinkedIn", "Twitter", "Instagram"].index(st.session_state.platform))
+    
+    # Update session state and transformer platform
+    st.session_state.platform = platform
+    transformer.set_platform(platform)
 
     # Configuration section in sidebar
     with st.sidebar:
@@ -42,13 +52,18 @@ def main():
         )
         
         if st.button("Add Example"):
-            if new_example:  # Only add if there's text
-                transformer.add_example(new_example)
-                st.success("Example added successfully!")
-                # Clear the text area by updating session state
-                st.session_state.example_text = ""
-                # Rerun to show the cleared text area
-                st.rerun()
+            if not new_example or not new_example.strip():
+                st.error("Please enter some text for the example!")
+            else:
+                try:
+                    transformer.add_example(new_example)
+                    st.success("Example added successfully!")
+                    # Clear the text area by updating session state
+                    st.session_state.example_text = ""
+                    # Force a rerun to update the UI
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Failed to add example: {str(e)}")
 
         # Add temperature slider in sidebar
         temperature = st.slider("LLM Temperature",
@@ -57,6 +72,14 @@ def main():
                                 value=0.8,
                                 step=0.01)
 
+        # Add this after the Add Example button (temporary for debugging)
+        if st.button("Show Examples"):
+            example_model = transformer.PLATFORM_MODELS[platform][0]
+            examples = transformer.db_session.query(example_model).all()
+            st.write(f"Total examples for {platform}: {len(examples)}")
+            for ex in examples:
+                st.text(ex.content)
+
     # Set the API key using the environment variable
     transformer.set_api_key(api_key, temperature)  # pass temperature value
 
@@ -64,12 +87,6 @@ def main():
     user_text = st.text_area("Enter your text:",
                              height=150,
                              placeholder="Paste your text here...")
-
-    # Platform selection with auto-reload of examples
-    platform = st.selectbox("Select target platform:",
-                            ["LinkedIn", "Twitter", "Instagram"])
-    # Set the platform immediately after selection
-    transformer.set_platform(platform)
 
     if st.button("Transform ✨", disabled=not api_key):
         if not user_text:

@@ -37,11 +37,22 @@ class PostTransformer:
         if not self.current_platform:
             raise ValueError("Please select a platform first!")
 
-        example_model = self.PLATFORM_MODELS[self.current_platform][0]
-        example = example_model(content=content)
-        self.db_session.add(example)
-        self.db_session.commit()
-        self.examples = self._load_examples()
+        if not content or not content.strip():
+            raise ValueError("Example content cannot be empty!")
+
+        try:
+            example_model = self.PLATFORM_MODELS[self.current_platform][0]
+            example = example_model(
+                id=str(uuid.uuid4()),
+                content=content.strip()
+            )
+            self.db_session.add(example)
+            self.db_session.commit()
+            self.examples = self._load_examples()
+            return True
+        except Exception as e:
+            self.db_session.rollback()
+            raise Exception(f"Error adding example: {str(e)}")
 
     def save_transformation(self, original_text, transformed_text):
         """Save transformation to platform-specific table"""

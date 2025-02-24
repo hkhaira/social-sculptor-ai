@@ -26,14 +26,25 @@ def main():
     with st.sidebar:
         st.header("Configuration")
         st.subheader("Training Examples")
+        
+        # Use session state to manage the text area value
+        if "example_text" not in st.session_state:
+            st.session_state.example_text = ""
+        
         new_example = st.text_area(
             "Your Example:",
-            help=
-            "Provide examples to train the AI on your writing style for generating improved posts."
+            value=st.session_state.example_text,
+            help="Provide examples to train the AI on your writing style for generating improved posts."
         )
+        
         if st.button("Add Example"):
-            transformer.add_example(new_example)
-            st.success("Example added successfully!")
+            if new_example:  # Only add if there's text
+                transformer.add_example(new_example)
+                st.success("Example added successfully!")
+                # Clear the text area by updating session state
+                st.session_state.example_text = ""
+                # Rerun to show the cleared text area
+                st.rerun()
 
         # Add temperature slider in sidebar
         temperature = st.slider("LLM Temperature",

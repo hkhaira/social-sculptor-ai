@@ -14,7 +14,7 @@ short_description: Transform your writing into engaging social media posts
 
 # ✨ Social Sculptor
 
-[![Demo](https://img.shields.io/badge/Demo-Hugging%20Face-yellow)](https://huggingface.co/spaces/hkhaira/socials-sculptor-ai)
+[![Demo](https://img.shields.io/badge/Demo-Hugging%20Face-yellow)](https://huggingface.co/spaces/hkhaira/social-sculptor)
 
 Transform your writing into engaging social media posts using AI.
 
@@ -32,7 +32,7 @@ Transform your writing into engaging social media posts using AI.
 1. Clone the repository:
    ```bash
    git clone <repository-url>
-   cd socials-sculptor
+   cd social-sculptor
    ```
 
 2. Create and activate a virtual environment (recommended):

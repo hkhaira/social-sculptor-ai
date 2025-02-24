@@ -26,6 +26,9 @@ def main():
     # Initialize platform in session state if not present
     if "platform" not in st.session_state:
         st.session_state.platform = "LinkedIn"
+    
+    if "show_success" not in st.session_state:
+        st.session_state.show_success = False
 
     # Platform selection with auto-reload of examples (moved to top)
     platform = st.selectbox("Select target platform:",
@@ -39,14 +42,22 @@ def main():
     # Configuration section in sidebar
     with st.sidebar:
         st.header("Configuration")
+        # Add temperature slider in sidebar
+        st.subheader("LLM Temperature")
+        temperature = st.slider("More conservative (0.0) to more creative (1.0)",
+                                min_value=0.0,
+                                max_value=1.0,
+                                value=0.88,
+                                step=0.01)
+
         st.subheader("Training Examples")
-        
         # Use session state to manage the text area value
         if "example_text" not in st.session_state:
             st.session_state.example_text = ""
         
         new_example = st.text_area(
             "Your Example:",
+            key="example_input",
             value=st.session_state.example_text,
             help="Provide examples to train the AI on your writing style for generating improved posts."
         )
@@ -57,20 +68,17 @@ def main():
             else:
                 try:
                     transformer.add_example(new_example)
-                    st.success("Example added successfully!")
-                    # Clear the text area by updating session state
+                    # Set success flag and clear text
+                    st.session_state.show_success = True
                     st.session_state.example_text = ""
-                    # Force a rerun to update the UI
                     st.rerun()
                 except Exception as e:
                     st.error(f"Failed to add example: {str(e)}")
 
-        # Add temperature slider in sidebar
-        temperature = st.slider("LLM Temperature",
-                                min_value=0.0,
-                                max_value=1.0,
-                                value=0.8,
-                                step=0.01)
+        # Add this right after the Add Example button
+        if st.session_state.show_success:
+            st.success("Example added successfully!")
+            st.session_state.show_success = False
 
         # Add this after the Add Example button (temporary for debugging)
         if st.button("Show Examples"):

@@ -92,9 +92,17 @@ def main():
                 transformed_post = transformer.transform_post(
                     user_text, platform)
                 st.success("Your transformed post is ready!")
+                
+                # Calculate dynamic height based on content length
+                # Assuming average of 50 characters per line, 20px per line
+                min_height = 150
+                max_height = 500
+                content_length = len(transformed_post)
+                calculated_height = min(max(min_height, (content_length // 50) * 20), max_height)
+                
                 st.text_area("Transformed Post:",
                              value=transformed_post,
-                             height=150)
+                             height=calculated_height)
                 # Save the transformation
                 transformer.save_transformation(user_text, transformed_post)
             except Exception as e:

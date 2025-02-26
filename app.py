@@ -39,9 +39,10 @@ def main():
     st.session_state.platform = platform
     transformer.set_platform(platform)
 
-    # Configuration section in sidebar
     with st.sidebar:
-        st.header("Configuration")
+        # st.header("SETTINGS", anchor=False)
+        st.markdown("<h1 style='text-align: center;'>Settings</h1>", unsafe_allow_html=True)
+
         # Add temperature slider in sidebar
         st.subheader("LLM Temperature")
         temperature = st.slider("More conservative (0.0) to more creative (1.0)",
@@ -50,6 +51,7 @@ def main():
                                 value=0.88,
                                 step=0.01)
 
+        st.divider()
         st.subheader("Training Examples")
         # Use session state to manage the text area value
         if "example_text" not in st.session_state:
@@ -82,11 +84,12 @@ def main():
 
         example_model = transformer.PLATFORM_MODELS[platform][0]
         examples = transformer.db_session.query(example_model).all()
-        st.write(f"Total examples for {platform}: {len(examples)}")
+        st.write(f"Total examples for {platform}: **{len(examples)}**")
         # Add this after the Add Example button (temporary for debugging)
-        if st.button("Show Examples"):
+        with st.expander("Show Examples"):
             for ex in examples:
                 st.text(ex.content)
+                st.divider()
 
     # Set the API key using the environment variable
     transformer.set_api_key(api_key, temperature)  # pass temperature value
@@ -110,7 +113,7 @@ def main():
                 # Calculate dynamic height based on content length
                 # Assuming average of 50 characters per line, 20px per line
                 min_height = 150
-                max_height = 500
+                max_height = 600
                 content_length = len(transformed_post)
                 calculated_height = min(max(min_height, (content_length // 50) * 20), max_height)
                 

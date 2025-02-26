@@ -88,7 +88,9 @@ def main():
         # Add this after the Add Example button (temporary for debugging)
         with st.expander("Show Examples"):
             for ex in examples:
-                st.text(ex.content)
+                # Get first two lines of content
+                preview_lines = ex.content.split('\n')[:2]
+                st.text('\n'.join(preview_lines))
                 st.divider()
 
     # Set the API key using the environment variable

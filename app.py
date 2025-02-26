@@ -80,11 +80,11 @@ def main():
             st.success("Example added successfully!")
             st.session_state.show_success = False
 
+        example_model = transformer.PLATFORM_MODELS[platform][0]
+        examples = transformer.db_session.query(example_model).all()
+        st.write(f"Total examples for {platform}: {len(examples)}")
         # Add this after the Add Example button (temporary for debugging)
         if st.button("Show Examples"):
-            example_model = transformer.PLATFORM_MODELS[platform][0]
-            examples = transformer.db_session.query(example_model).all()
-            st.write(f"Total examples for {platform}: {len(examples)}")
             for ex in examples:
                 st.text(ex.content)
 

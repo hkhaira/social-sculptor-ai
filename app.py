@@ -30,14 +30,18 @@ def main():
     if "show_success" not in st.session_state:
         st.session_state.show_success = False
 
-    # Platform selection with auto-reload of examples (moved to top)
+    def update_platform():
+        st.session_state.platform = st.session_state.platform_selector
+        
+    # Platform selection with callback
     platform = st.selectbox("Select target platform:",
                           ["LinkedIn", "Twitter", "Instagram"],
+                          key="platform_selector",
+                          on_change=update_platform,
                           index=["LinkedIn", "Twitter", "Instagram"].index(st.session_state.platform))
-    
-    # Update session state and transformer platform
-    st.session_state.platform = platform
-    transformer.set_platform(platform)
+
+    # Update transformer platform
+    transformer.set_platform(st.session_state.platform)
 
     with st.sidebar:
         # st.header("SETTINGS", anchor=False)

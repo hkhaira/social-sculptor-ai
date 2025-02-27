@@ -130,9 +130,34 @@ def main():
                 content_length = len(transformed_post)
                 calculated_height = min(max(min_height, (content_length // 50) * 20), max_height)
                 
-                st.text_area("Transformed Post:",
-                             value=transformed_post,
-                             height=calculated_height)
+                # Create a container to maintain state
+                result_container = st.container()
+                
+                with result_container:
+                    st.write("Transformed Post:")
+                    # Add custom CSS to control height
+                    st.markdown(
+                        f"""
+                        <style>
+                        .stCodeBlock {{
+                            max-height: {calculated_height}px !important;
+                        }}
+                        .stCodeBlock pre {{
+                            white-space: pre-wrap !important;
+                            word-wrap: break-word !important;
+                            overflow-x: hidden !important;
+                        }}
+                        code {{
+                            white-space: pre-wrap !important;
+                            word-wrap: break-word !important;
+                        }}
+                        </style>
+                        """,
+                        unsafe_allow_html=True
+                    )
+                    # Add padding to prevent text from touching edges
+                    st.code(transformed_post, language=None)
+                
                 # Save the transformation
                 transformer.save_transformation(user_text, transformed_post)
             except Exception as e:

@@ -53,31 +53,37 @@ def main():
 
         st.divider()
         st.subheader("Training Examples")
-        # Use session state to manage the text area value
+        
+        # Check and clear if needed - BEFORE creating the text area
+        if "clear_text" in st.session_state and st.session_state.clear_text:
+            st.session_state.example_text = ""
+            st.session_state.clear_text = False
+            
+        # Initialize example_text if not present
         if "example_text" not in st.session_state:
             st.session_state.example_text = ""
         
+        # Create the text area
         new_example = st.text_area(
             "Your Example:",
-            key="example_input",
-            value=st.session_state.example_text,
+            key="example_text",
             help="Provide examples to train the AI on your writing style for generating improved posts."
         )
-        
+
+        # Handle the button click and state updates
         if st.button("Add Example"):
             if not new_example or not new_example.strip():
                 st.error("Please enter some text for the example!")
             else:
                 try:
                     transformer.add_example(new_example)
-                    # Set success flag and clear text
+                    st.session_state.clear_text = True
                     st.session_state.show_success = True
-                    st.session_state.example_text = ""
                     st.rerun()
                 except Exception as e:
                     st.error(f"Failed to add example: {str(e)}")
 
-        # Add this right after the Add Example button
+        # Show success message if needed
         if st.session_state.show_success:
             st.success("Example added successfully!")
             st.session_state.show_success = False

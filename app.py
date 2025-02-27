@@ -134,7 +134,7 @@ def main():
                 result_container = st.container()
                 
                 with result_container:
-                    st.write("Transformed Post:")
+                    st.subheader("Transformed Post:")
                     # Add custom CSS to control height
                     st.markdown(
                         f"""

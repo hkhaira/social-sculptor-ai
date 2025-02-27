@@ -89,11 +89,12 @@ def main():
             st.session_state.show_success = False
 
         example_model = transformer.PLATFORM_MODELS[platform][0]
-        examples = transformer.db_session.query(example_model).order_by(example_model.created_at.desc()).limit(5).all()
-        st.write(f"Total examples for {platform}: **{len(examples)}**")
+        all_examples = transformer.db_session.query(example_model).all()
+        top5_examples = transformer.db_session.query(example_model).order_by(example_model.created_at.desc()).limit(5).all()
+        st.write(f"Total examples for {platform}: **{len(all_examples)}**")
         # Add this after the Add Example button (temporary for debugging)
         with st.expander("Preview Examples"):
-            for ex in examples:
+            for ex in top5_examples:
                 # Get first two lines of content
                 preview_lines = ex.content.split('\n')[:2]
                 st.text('\n'.join(preview_lines))

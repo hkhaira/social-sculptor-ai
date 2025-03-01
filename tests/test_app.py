@@ -93,17 +93,15 @@ class TestApp(unittest.TestCase):
         # Set up session state
         self.mock_session_state["platform"] = "LinkedIn"
 
-        # Mock the text area input
-        self.mock_st.text_area.return_value = "Test input text"
+        # Return main text input for the primary text_area (no key) and example text for sidebar if key provided
+        self.mock_st.text_area.side_effect = lambda *args, **kwargs: "Test input text" if kwargs.get(
+            "key") is None else "Test example"
 
         # Mock the transformer response
         self.mock_transformer.transform_post.return_value = "Transformed text"
 
-        # Mock the button to return True for "Transform"
-        def mock_button(label, *args, **kwargs):
-            return label == "Transform"
-
-        self.mock_st.button.side_effect = mock_button
+        # Mock the button to return True for "Transform ✨"
+        self.mock_st.button.side_effect = lambda label, *args, **kwargs: True if label == "Transform ✨" else False
 
         # Run the app
         main()
@@ -120,14 +118,12 @@ class TestApp(unittest.TestCase):
         # Set up session state
         self.mock_session_state["platform"] = "LinkedIn"
 
-        # Mock empty text area input
-        self.mock_st.text_area.return_value = ""
+        # Return empty string for the main text area input
+        self.mock_st.text_area.side_effect = lambda *args, **kwargs: "" if kwargs.get(
+            "key") is None else "Test example"
 
-        # Mock the button to return True for "Transform"
-        def mock_button(label, *args, **kwargs):
-            return label == "Transform"
-
-        self.mock_st.button.side_effect = mock_button
+        # Mock the button to return True for "Transform ✨"
+        self.mock_st.button.side_effect = lambda label, *args, **kwargs: True if label == "Transform ✨" else False
 
         # Run the app
         main()
@@ -143,20 +139,12 @@ class TestApp(unittest.TestCase):
         self.mock_session_state["platform"] = "LinkedIn"
         self.mock_session_state["example_text"] = "Test example"
 
-        # Mock the sidebar context manager
-        sidebar_mock = MagicMock()
-        self.mock_st.sidebar.configure_mock(
-            __enter__=MagicMock(return_value=sidebar_mock),
-            __exit__=MagicMock(return_value=None))
-
-        # Mock the text area in sidebar to return the example text
-        sidebar_mock.text_area.return_value = "Test example"
+        # Instead of mocking st.sidebar, set text_area to return the example text when key is "example_text"
+        self.mock_st.text_area.side_effect = lambda *args, **kwargs: "Test example" if kwargs.get(
+            "key") == "example_text" else "Test input text"
 
         # Mock the button to return True for "Add Example" and False for others
-        def mock_button(label, *args, **kwargs):
-            return label == "Add Example"
-
-        sidebar_mock.button.side_effect = mock_button
+        self.mock_st.button.side_effect = lambda label, *args, **kwargs: True if label == "Add Example" else False
 
         # Run the app
         main()

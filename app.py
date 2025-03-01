@@ -80,6 +80,7 @@ def main():
 
         # Handle the button click and state updates
         if st.button("Add Example"):
+            st.session_state.show_success = False  # Reset success message
             if not new_example or not new_example.strip():
                 st.error("Please enter some text for the example!")
             else:
@@ -94,7 +95,7 @@ def main():
                 except Exception as e:
                     st.error(f"Failed to add example: {str(e)}")
 
-        # Show success message if needed, do not reset show_success here
+        # Show success message
         if st.session_state.show_success:
             st.success("Example added successfully!")
 

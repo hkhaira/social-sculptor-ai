@@ -9,6 +9,17 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from app import main
 
+# Mock session state needs to be updated to handle attribute-style access
+class MockSessionState(dict):
+    """A mock class that mimics Streamlit's session state with both dict and attribute access"""
+    def __getattr__(self, key):
+        if key in self:
+            return self[key]
+        return None
+        
+    def __setattr__(self, key, value):
+        self[key] = value
+
 class TestApp(unittest.TestCase):
     def setUp(self):
         # Mock Streamlit
@@ -21,8 +32,8 @@ class TestApp(unittest.TestCase):
         self.mock_transformer = MagicMock()
         self.mock_transformer_class.return_value = self.mock_transformer
         
-        # Mock session state
-        self.mock_session_state = {}
+        # Mock session state with our custom class that supports attribute access
+        self.mock_session_state = MockSessionState()
         self.mock_st.session_state = self.mock_session_state
         
         # Mock environment variables

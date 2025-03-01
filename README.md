@@ -82,6 +82,14 @@ Transform your writing into engaging social media posts using AI.
 - The database file (`social_sculptor.db`) is created in your project directory
 - To start fresh, simply delete the database file (it will be recreated on next run)
 
+
+## Running Tests
+
+To run the test suite, execute the following command in your terminal:
+```bash
+pytest tests/
+```
+
 ## License
 
 [MIT - LICENSE](LICENSE)

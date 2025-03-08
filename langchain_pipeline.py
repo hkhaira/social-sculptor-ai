@@ -42,10 +42,8 @@ class PostTransformer:
 
         try:
             example_model = self.PLATFORM_MODELS[self.current_platform][0]
-            example = example_model(
-                id=str(uuid.uuid4()),
-                content=content.strip()
-            )
+            example = example_model(id=str(uuid.uuid4()),
+                                    content=content.strip())
             self.db_session.add(example)
             self.db_session.commit()
             self.examples = self._load_examples()
@@ -89,6 +87,7 @@ class PostTransformer:
             3. Optimizing for {platform}'s best practices
             4. Adding relevant emojis where appropriate
             5. Including appropriate hashtags (for Instagram/Twitter)
+            6. Removing any markdown text formatting
             """), ("user", text)])
 
         response = self.llm(prompt.format_messages())

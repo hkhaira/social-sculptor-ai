@@ -162,7 +162,6 @@ def main():
                         </style>
                         """,
                                 unsafe_allow_html=True)
-                    # Add padding to prevent text from touching edges
                     st.code(transformed_post, language=None)
 
                 # Save the transformation

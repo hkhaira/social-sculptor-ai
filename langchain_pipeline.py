@@ -86,7 +86,7 @@ class PostTransformer:
             2. Making it more impactful and memorable
             3. Optimizing for {platform}'s best practices
             4. Adding relevant emojis where appropriate
-            5. Including appropriate hashtags (for Instagram/Twitter)
+            5. Do not include hastags or mentions
             6. Removing any markdown text formatting
             """), ("user", text)])
 

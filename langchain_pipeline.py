@@ -102,6 +102,8 @@ class PostTransformer:
 
             10 Encourage Engagement & Action: Where appropriate, include a natural call-to-action (CTA) that encourages likes, comments, shares, or interactions.
 
+            11. Adapt Content length to Platform: Ensure the post length is optimized for {platform} to maximize engagement and readability.
+
             Additional Instructions:
             Do not add unnecessary fluff; keep the content concise yet powerful.
             If the original text is too long, summarize it while keeping the core message intact.

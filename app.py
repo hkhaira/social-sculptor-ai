@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import threading
 import uuid
 from datetime import datetime
+from dataset_tools import load_and_analyze_dataset, prepare_for_fine_tuning
 
 
 def main():
@@ -228,6 +229,42 @@ def main():
             st.text(t.transformed_text)
             st.write(f"*Created at: {t.created_at}*")
             st.divider()
+
+
+def show_dataset_dashboard():
+    st.title("Dataset Statistics Dashboard")
+    
+    repo_name = st.text_input("Dataset Repository Name", value=os.getenv("DATASET_REPO_NAME", ""))
+    
+    if st.button("Load Dataset Statistics") and repo_name:
+        with st.spinner("Loading dataset statistics..."):
+            try:
+                dataset, stats = load_and_analyze_dataset(repo_name)
+                
+                # Display overall statistics
+                st.subheader("Overall Statistics")
+                total_examples = sum(stat["total_examples"] for stat in stats.values())
+                st.metric("Total Examples", total_examples)
+                
+                # Display platform-specific statistics
+                st.subheader("Platform Statistics")
+                for platform, platform_stats in stats.items():
+                    with st.expander(f"{platform.capitalize()} - {platform_stats['total_examples']} examples"):
+                        st.metric("Average Original Length", f"{platform_stats['avg_original_length']:.1f} chars")
+                        st.metric("Average Transformed Length", f"{platform_stats['avg_transformed_length']:.1f} chars")
+                
+                # Add option to export for fine-tuning
+                if st.button("Prepare for Fine-Tuning"):
+                    with st.spinner("Preparing data for fine-tuning..."):
+                        fine_tuning_data = prepare_for_fine_tuning(dataset)
+                        st.success(f"Fine-tuning data prepared! ({len(fine_tuning_data)} examples)")
+                        st.download_button(
+                            "Download Fine-Tuning Data",
+                            data=open("fine_tuning_data.jsonl", "rb"),
+                            file_name="fine_tuning_data.jsonl"
+                        )
+            except Exception as e:
+                st.error(f"Failed to load dataset: {str(e)}")
 
 
 if __name__ == "__main__":

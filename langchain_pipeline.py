@@ -3,6 +3,7 @@ from langchain_community.chat_models import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
 from database import init_db, LinkedInExample, TwitterExample, InstagramExample, LinkedInTransformation, TwitterTransformation, InstagramTransformation
 import uuid
+from huggingface_dataset import HuggingFaceDatasetManager
 
 
 class PostTransformer:
@@ -17,6 +18,8 @@ class PostTransformer:
         self.db_session = init_db()
         self.current_platform = None
         self.examples = []
+        # Initialize HF dataset manager
+        self.hf_dataset_manager = HuggingFaceDatasetManager()
 
     def set_platform(self, platform):
         """Update current platform and load relevant examples"""
@@ -53,17 +56,37 @@ class PostTransformer:
             raise Exception(f"Error adding example: {str(e)}")
 
     def save_transformation(self, original_text, transformed_text):
-        """Save transformation to platform-specific table"""
+        """Save transformation to platform-specific table and Hugging Face dataset"""
         if not self.current_platform:
             raise ValueError("Please select a platform first!")
 
+        # Save to local database
         transformation_model = self.PLATFORM_MODELS[self.current_platform][1]
+        transformation_id = str(uuid.uuid4())
         transformation = transformation_model(
-            id=str(uuid.uuid4()),
+            id=transformation_id,
             original_text=original_text,
             transformed_text=transformed_text)
         self.db_session.add(transformation)
         self.db_session.commit()
+        
+        # Save to Hugging Face dataset with metadata
+        metadata = {
+            "id": transformation_id,
+            "model": self.llm.model_name if self.llm else "unknown",
+            "temperature": self.llm.temperature if self.llm else 0.0,
+            "example_count": len(self.examples)
+        }
+        
+        try:
+            self.hf_dataset_manager.add_transformation(
+                platform=self.current_platform,
+                original_text=original_text,
+                transformed_text=transformed_text,
+                metadata=metadata
+            )
+        except Exception as e:
+            print(f"Warning: Failed to save to Hugging Face dataset: {str(e)}")
 
     def set_api_key(
             self,

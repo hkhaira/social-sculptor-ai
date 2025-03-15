@@ -2,6 +2,7 @@ import streamlit as st
 from langchain_pipeline import PostTransformer
 import os
 from dotenv import load_dotenv
+import threading
 
 
 def main():
@@ -112,6 +113,24 @@ def main():
                 st.text('\n'.join(preview_lines))
                 st.divider()
 
+        st.divider()
+        st.subheader("Hugging Face Dataset")
+        
+        # Show dataset stats
+        if st.button("Sync Dataset with Hugging Face"):
+            with st.spinner("Syncing dataset..."):
+                try:
+                    transformer.hf_dataset_manager.push_to_hub()
+                    st.success("Dataset successfully pushed to Hugging Face!")
+                except Exception as e:
+                    st.error(f"Failed to sync dataset: {str(e)}")
+        
+        # Option for automatic syncing
+        enable_auto_sync = st.toggle("Enable automatic syncing", value=False)
+        
+        if enable_auto_sync:
+            st.info("Dataset will be automatically synced after each transformation")
+
     # Set the API key using the environment variable
     transformer.set_api_key(api_key, temperature)  # pass temperature value
 
@@ -127,10 +146,21 @@ def main():
 
         with st.spinner("Transforming your post..."):
             try:
-                transformed_post = transformer.transform_post(
-                    user_text, platform)
+                transformed_post = transformer.transform_post(user_text, platform)
                 st.success("Your transformed post is ready!")
-
+                
+                # Auto-sync if enabled
+                if "enable_auto_sync" in st.session_state and st.session_state.enable_auto_sync:
+                    with st.spinner("Syncing with Hugging Face..."):
+                        def sync_in_background():
+                            try:
+                                transformer.hf_dataset_manager.push_to_hub()
+                            except Exception as e:
+                                print(f"Auto-sync failed: {str(e)}")
+                        
+                        # Run sync in background thread to avoid blocking UI
+                        threading.Thread(target=sync_in_background).start()
+                
                 # Calculate dynamic height based on content length
                 # Assuming average of 50 characters per line, 20px per line
                 min_height = 150

@@ -3,6 +3,8 @@ from langchain_pipeline import PostTransformer
 import os
 from dotenv import load_dotenv
 import threading
+import uuid
+from datetime import datetime
 
 
 def main():
@@ -195,7 +197,20 @@ def main():
                     st.code(transformed_post, language=None)
 
                 # Save the transformation
-                transformer.save_transformation(user_text, transformed_post)
+                metadata = {
+                    "id": str(uuid.uuid4()),
+                    "model": transformer.llm.model_name if transformer.llm else "unknown",
+                    "temperature": transformer.llm.temperature if transformer.llm else 0.0,
+                    "example_count": len(transformer.examples),
+                    "platform": transformer.current_platform,
+                    "timestamp": datetime.now().isoformat(),
+                    "character_count_original": len(user_text),
+                    "character_count_transformed": len(transformed_post),
+                    "word_count_original": len(user_text.split()),
+                    "word_count_transformed": len(transformed_post.split()),
+                    "session_id": str(uuid.uuid4())  # To group transformations from same session
+                }
+                transformer.save_transformation(user_text, transformed_post, metadata)
             except Exception as e:
                 st.error(f"An error occurred: {str(e)}")
 

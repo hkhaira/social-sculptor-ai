@@ -119,15 +119,7 @@ def main():
         st.divider()
         st.subheader("Hugging Face Dataset")
         
-        # Show dataset stats
-        if st.button("Sync Dataset with Hugging Face"):
-            with st.spinner("Syncing dataset..."):
-                try:
-                    transformer.hf_dataset_manager.push_to_hub()
-                    st.success("Dataset successfully pushed to Hugging Face!")
-                except Exception as e:
-                    st.error(f"Failed to sync dataset: {str(e)}")
-        
+        # Remove the sync button and just show the info message
         st.info("All transformations are automatically saved to Hugging Face")
 
     # Set the API key using the environment variable
@@ -148,7 +140,7 @@ def main():
                 transformed_post = transformer.transform_post(user_text, platform)
                 st.success("Your transformed post is ready!")
                 
-                # Always sync with Hugging Face (no toggle check)
+                # Always sync with Hugging Face
                 with st.spinner("Syncing with Hugging Face..."):
                     def sync_in_background():
                         try:

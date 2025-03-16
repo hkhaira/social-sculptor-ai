@@ -128,11 +128,7 @@ def main():
                 except Exception as e:
                     st.error(f"Failed to sync dataset: {str(e)}")
         
-        # Option for automatic syncing
-        enable_auto_sync = st.toggle("Enable automatic syncing", value=False)
-        
-        if enable_auto_sync:
-            st.info("Dataset will be automatically synced after each transformation")
+        st.info("All transformations are automatically saved to Hugging Face")
 
     # Set the API key using the environment variable
     transformer.set_api_key(api_key, temperature)  # pass temperature value
@@ -152,17 +148,16 @@ def main():
                 transformed_post = transformer.transform_post(user_text, platform)
                 st.success("Your transformed post is ready!")
                 
-                # Auto-sync if enabled
-                if "enable_auto_sync" in st.session_state and st.session_state.enable_auto_sync:
-                    with st.spinner("Syncing with Hugging Face..."):
-                        def sync_in_background():
-                            try:
-                                transformer.hf_dataset_manager.push_to_hub()
-                            except Exception as e:
-                                print(f"Auto-sync failed: {str(e)}")
-                        
-                        # Run sync in background thread to avoid blocking UI
-                        threading.Thread(target=sync_in_background).start()
+                # Always sync with Hugging Face (no toggle check)
+                with st.spinner("Syncing with Hugging Face..."):
+                    def sync_in_background():
+                        try:
+                            transformer.hf_dataset_manager.push_to_hub()
+                        except Exception as e:
+                            print(f"Auto-sync failed: {str(e)}")
+                    
+                    # Run sync in background thread to avoid blocking UI
+                    threading.Thread(target=sync_in_background).start()
                 
                 # Calculate dynamic height based on content length
                 # Assuming average of 50 characters per line, 20px per line

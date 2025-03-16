@@ -26,10 +26,17 @@ class HuggingFaceDatasetManager:
             return dataset_dict
         except Exception:
             # Create new dataset structure if not exists
+            # Ensure all datasets have the same feature structure with non-null values
+            empty_dataset = {
+                "original_text": [], 
+                "transformed_text": [], 
+                "metadata": []
+            }
+            
             return DatasetDict({
-                "linkedin": Dataset.from_dict({"original_text": [], "transformed_text": [], "metadata": []}),
-                "twitter": Dataset.from_dict({"original_text": [], "transformed_text": [], "metadata": []}),
-                "instagram": Dataset.from_dict({"original_text": [], "transformed_text": [], "metadata": []})
+                "linkedin": Dataset.from_dict(empty_dataset),
+                "twitter": Dataset.from_dict(empty_dataset),
+                "instagram": Dataset.from_dict(empty_dataset)
             })
     
     def add_transformation(self, platform, original_text, transformed_text, metadata=None):
@@ -62,6 +69,17 @@ class HuggingFaceDatasetManager:
         
         # Update the dataset
         self.dataset_dict[platform] = new_dataset
+        
+        # Ensure all platforms have the same feature structure
+        # This is important when one platform has data but others don't
+        for other_platform in self.dataset_dict:
+            if other_platform != platform and len(self.dataset_dict[other_platform]) == 0:
+                # Initialize empty platform datasets with at least one dummy row to establish types
+                self.dataset_dict[other_platform] = Dataset.from_dict({
+                    "original_text": [""],  # Empty string instead of null
+                    "transformed_text": [""],
+                    "metadata": ["{}"]
+                })
         
     def push_to_hub(self):
         """Push the dataset to Hugging Face Hub"""

@@ -116,6 +116,12 @@ def main():
                 st.text('\n'.join(preview_lines))
                 st.divider()
 
+        st.divider()
+        st.subheader("Dataset Analytics")
+        
+        if st.button("Open Dataset Dashboard"):
+            st.session_state.show_dashboard = True
+
 
     # Set the API key using the environment variable
     transformer.set_api_key(api_key, temperature)  # pass temperature value
@@ -209,6 +215,15 @@ def main():
             st.text(t.transformed_text)
             st.write(f"*Created at: {t.created_at}*")
             st.divider()
+    
+    # Check if dashboard should be shown
+    if "show_dashboard" in st.session_state and st.session_state.show_dashboard:
+        # Show the dashboard in a new tab/section
+        with st.expander("Dataset Dashboard", expanded=True):
+            show_dataset_dashboard()
+            if st.button("Close Dashboard"):
+                st.session_state.show_dashboard = False
+                st.rerun()
 
 
 def show_dataset_dashboard():

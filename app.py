@@ -116,11 +116,6 @@ def main():
                 st.text('\n'.join(preview_lines))
                 st.divider()
 
-        st.divider()
-        st.subheader("Hugging Face Dataset")
-        
-        # Remove the sync button and just show the info message
-        st.info("All transformations are automatically saved to Hugging Face")
 
     # Set the API key using the environment variable
     transformer.set_api_key(api_key, temperature)  # pass temperature value

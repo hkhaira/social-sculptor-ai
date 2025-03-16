@@ -55,7 +55,7 @@ class PostTransformer:
             self.db_session.rollback()
             raise Exception(f"Error adding example: {str(e)}")
 
-    def save_transformation(self, original_text, transformed_text):
+    def save_transformation(self, original_text, transformed_text, metadata=None):
         """Save transformation to platform-specific table and Hugging Face dataset"""
         if not self.current_platform:
             raise ValueError("Please select a platform first!")
@@ -71,12 +71,15 @@ class PostTransformer:
         self.db_session.commit()
         
         # Save to Hugging Face dataset with metadata
-        metadata = {
+        if metadata is None:
+            metadata = {}
+        
+        metadata.update({
             "id": transformation_id,
             "model": self.llm.model_name if self.llm else "unknown",
             "temperature": self.llm.temperature if self.llm else 0.0,
             "example_count": len(self.examples)
-        }
+        })
         
         try:
             self.hf_dataset_manager.add_transformation(

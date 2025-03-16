@@ -1,7 +1,5 @@
 from datasets import load_dataset
 import json
-import pandas as pd
-import matplotlib.pyplot as plt
 
 def load_and_analyze_dataset(repo_name):
     """Load and analyze the dataset from Hugging Face Hub"""
@@ -28,9 +26,9 @@ def prepare_for_fine_tuning(dataset, output_format="jsonl"):
             # Format depends on the model you'll be fine-tuning
             example = {
                 "messages": [
-                    {"role": "system", f"You are a content optimizer for {platform}"},
-                    {"role": "user", platform_data["original_text"][i]},
-                    {"role": "assistant", platform_data["transformed_text"][i]}
+                    {"role": "system", "content": f"You are a content optimizer for {platform}"},
+                    {"role": "user", "content": platform_data["original_text"][i]},
+                    {"role": "assistant", "content": platform_data["transformed_text"][i]}
                 ]
             }
             fine_tuning_data.append(example)

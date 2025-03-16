@@ -50,20 +50,38 @@ class HuggingFaceDatasetManager:
         # Convert metadata to string for storage
         metadata_str = json.dumps(metadata)
         
-        # Create new dataset with added example
-        new_example = {
-            "original_text": [original_text],
-            "transformed_text": [transformed_text],
-            "metadata": [metadata_str]
-        }
+        # Get existing data
+        current_dataset = self.dataset_dict[platform]
         
-        # Append to existing dataset
-        platform_dataset = self.dataset_dict[platform]
-        self.dataset_dict[platform] = Dataset.from_dict({
-            **platform_dataset,
-            **new_example
+        # Create new dataset with the added example
+        new_dataset = Dataset.from_dict({
+            "original_text": current_dataset["original_text"] + [original_text],
+            "transformed_text": current_dataset["transformed_text"] + [transformed_text],
+            "metadata": current_dataset["metadata"] + [metadata_str]
         })
+        
+        # Update the dataset
+        self.dataset_dict[platform] = new_dataset
         
     def push_to_hub(self):
         """Push the dataset to Hugging Face Hub"""
-        self.dataset_dict.push_to_hub(self.repo_name)
+        if not self.token:
+            raise ValueError("Hugging Face token is required to push to hub. Set HUGGINGFACE_TOKEN in your environment.")
+        
+        if not self.repo_name:
+            raise ValueError("Repository name is required to push to hub. Set DATASET_REPO_NAME in your environment.")
+        
+        # Ensure we're logged in
+        login(token=self.token)
+        
+        try:
+            # Push the dataset to the hub
+            self.dataset_dict.push_to_hub(
+                self.repo_name,
+                private=False,
+                token=self.token
+            )
+            return True
+        except Exception as e:
+            print(f"Error pushing to Hugging Face Hub: {str(e)}")
+            raise

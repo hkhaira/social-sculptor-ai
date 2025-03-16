@@ -116,11 +116,12 @@ def main():
                 st.text('\n'.join(preview_lines))
                 st.divider()
 
-        st.divider()
-        st.subheader("Dataset Analytics")
+        # TODO: Add dataset analytics
+        # st.divider()
+        # st.subheader("Dataset Analytics")
         
-        if st.button("Open Dataset Dashboard"):
-            st.session_state.show_dashboard = True
+        # if st.button("Open Dataset Dashboard"):
+        #     st.session_state.show_dashboard = True
 
 
     # Set the API key using the environment variable
@@ -243,10 +244,17 @@ def show_dataset_dashboard():
                 
                 # Display platform-specific statistics
                 st.subheader("Platform Statistics")
-                for platform, platform_stats in stats.items():
-                    with st.expander(f"{platform.capitalize()} - {platform_stats['total_examples']} examples"):
-                        st.metric("Average Original Length", f"{platform_stats['avg_original_length']:.1f} chars")
-                        st.metric("Average Transformed Length", f"{platform_stats['avg_transformed_length']:.1f} chars")
+                
+                # Create tabs instead of nested expanders
+                platform_tabs = st.tabs([f"{platform.capitalize()} ({stats[platform]['total_examples']} examples)" for platform in stats.keys()])
+                
+                for i, (platform, platform_stats) in enumerate(stats.items()):
+                    with platform_tabs[i]:
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            st.metric("Average Original Length", f"{platform_stats['avg_original_length']:.1f} chars")
+                        with col2:
+                            st.metric("Average Transformed Length", f"{platform_stats['avg_transformed_length']:.1f} chars")
                 
                 # Add option to export for fine-tuning
                 if st.button("Prepare for Fine-Tuning"):
